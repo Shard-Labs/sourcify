@@ -51,7 +51,6 @@
     "cbor": "^4.3.0",
     "chalk": "^4.0.0",
     "clear": "^0.1.0",
-    "commander": "^5.1.0",
     "cors": "^2.8.5",
     "death": "^1.1.0",
     "directory-tree": "^2.2.4",
@@ -68,7 +67,8 @@
     "serve-index": "^1.9.1",
     "solc": "^0.6.1",
     "solc-version-manager": "^0.1.6",
-    "web3": "^1.2.6"
+    "web3": "^1.2.6",
+    "yargs": "^15.3.1"
   },
   "devDependencies": {
     "@0x/sol-compiler": "^4.0.3",
@@ -83,6 +83,7 @@
     "@types/node": "^13.11.1",
     "@types/request-promise-native": "^1.0.17",
     "@types/serve-index": "^1.7.30",
+    "@types/yargs": "^15.0.5",
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
     "ganache-cli": "^6.8.2",

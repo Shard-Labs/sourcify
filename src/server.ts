@@ -3,6 +3,7 @@ import serveIndex from 'serve-index';
 import fileUpload from 'express-fileupload';
 import cors from 'cors';
 import { log } from './utils';
+import Injector from './injector';
 import {
   InputData,
   errorMiddleware,
@@ -13,14 +14,21 @@ import {
   getChainId,
   verify,
 } from "./utils";
+import dotenv from 'dotenv';
 
 const app = express();
+dotenv.config();
 
 let localChainUrl;
 
 if (process.env.TESTING) {
   localChainUrl = process.env.LOCALCHAIN_URL;
 }
+
+const injector = new Injector({
+    localChainUrl: localChainUrl,
+    log: log
+});
 
 const repository = process.env.MOCK_REPOSITORY || './repository';
 const port = process.env.SERVER_PORT;
@@ -70,13 +78,13 @@ app.get('/files/:chain/:address', (req, res, next) => {
 app.post('/', (req, res, next) => {
   const inputData: InputData = {
     repository: repository,
-    files: [],
+    files: req.files,
     addresses: [req.body.address],
     chain: getChainId(req.body.chain)
   }
 
   try{
-    Promise.all(verify(inputData)).then((result) => {
+    Promise.all(verify(inputData, injector)).then((result) => {
       res.status(200).send({
         result
       })
@@ -86,35 +94,6 @@ app.post('/', (req, res, next) => {
   } catch (err) {
     return next(err);
   }
-
-  // // Try to find by address, return on success.
-  // try {
-  //   const result = findByAddress(req.body.address, inputData.chain, repository);
-  //   res.status(200).send({result});
-  //   return;
-  // } catch(err) {
-  //   const msg = "Could not find file in repository, proceeding to recompilation"
-  //   log.info({loc:'[POST:VERIFICATION_BY_ADDRESS_FAILED]'}, msg);
-  // }
-
-  // // Try to organize files for submission, exit on error.
-  // try {
-  //   const files = findInputFiles(req);
-  //   inputData.files = sanitizeInputFiles(files);
-  // } catch (err) {
-  //   return next(err);
-  // }
-
-  // // Injection
-  // const promises: Promise<Match>[] = [];
-  // promises.push(injector.inject(inputData));
-
-  // // This is so we can have multiple parallel injections, logic still has to be completely implemented
-  // Promise.all(promises).then((result) => {
-  //   res.status(200).send({result});
-  // }).catch(err => {
-  //   next(err); // Just forward it to error middelware
-  // })
 })
 
 app.use(errorMiddleware);

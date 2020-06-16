@@ -20,11 +20,6 @@ export const log = Logger.createLogger({
     level: 30
   }]
 });
-
-export const injector = new Injector({
-  localChainUrl: localChainUrl,
-  log: log
-});
  
 declare interface StringMap {
   [key: string]: string;
@@ -190,7 +185,7 @@ export type InputData = {
   repository: string
   chain: string,
   addresses: string[],
-  files: string[],
+  files: any,
   bytecode?: string
 }
 
@@ -334,7 +329,7 @@ export function getChainByName(name: string): any {
 }
 
 
-export function verify(inputData: InputData): any{
+export function verify(inputData: InputData, injector: Injector): any{
 
   // Try to find by address, return on success.
   try {
